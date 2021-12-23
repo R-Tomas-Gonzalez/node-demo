@@ -1,9 +1,22 @@
-const http = require('http');
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
 
-const routes = require('./routes');
+const app = express();
 
-console.log(routes.someText);
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
-const server = http.createServer(routes.handler);
+const PORT = 3000;
 
-server.listen(3000);
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+
+app.use((req, res, next) => {
+    res.status(400).sendFile(path.join(__dirname, 'views', '404.html'))
+});
+
+app.listen(PORT, () => {console.log(`...listening on port: ${PORT}`)});
